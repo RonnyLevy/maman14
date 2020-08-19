@@ -155,13 +155,15 @@ void line_analysis(const char* line)
    	{
    		/* found label */
    		
+   		printf("found label\n");
+   		
    		has_symbol = true;
    		
    		tokens[tokens_arr_index] = token; 		
    	}
    	else
    	{
-   		tokens[tokens_arr_index] = NULL;
+   		tokens[tokens_arr_index] = NULL; /* remember the structure: tokens[0] - label, tokens[1] - instruction, tokens[2] - 										operand1 , tokens[3] - operand2. if not exist - NULL */
    	}  	
    	
    	tokens_arr_index++;
@@ -170,9 +172,9 @@ void line_analysis(const char* line)
 	
 	if (!has_symbol)
 	{
-		token = strtok(src_line, " , ");
+		token = strtok(src_line, " \t, ");
 		
-		/*printf("token = %s\n", token);*/
+		/*printf("#### token = %s\n", token);*/
 		
 		if (token != NULL)
 		{
@@ -184,9 +186,9 @@ void line_analysis(const char* line)
 	
 	while (token != NULL)
 	{
-		token = strtok(NULL, " ,");
+		token = strtok(NULL, " \t,");
 			
-		/*printf("token = %s\n", token);*/
+		/*printf("@@@@ token = %s\n", token);*/
 		
 		if (token != NULL)
 		{
@@ -196,11 +198,11 @@ void line_analysis(const char* line)
 		}
 	}
 	
-	/* is this line is string / data guidance ? */
-
-	tokens_processing(tokens);	
+	int idx = 0;
 	
+	for ( ; idx <  tokens_arr_index ; idx++) printf("loop:: token = %s\n", tokens[idx]);
 	
+	/*tokens_processing(tokens);	
 	
 	/* in the end, clear all for next line */
 	
@@ -217,7 +219,7 @@ bool tokens_processing(const char* token[])
 {
 	char* label_name  = token[0];
 	
-	char* instruction = token[1];
+	char* command     = token[1];
 	
 	char* operand1    = token[2];
 	
@@ -227,92 +229,77 @@ bool tokens_processing(const char* token[])
 	
 	label* new_label_ptr = &new_label; /* for filling label (if exist) */
 	
-	/* first, check instruction type */
+	/* The most important token now is token[1]. try to identify which kind of type instruction is.
 	
-	if (!strcmp(instruction, data_guidance))
+	   There are three posibilities options: 
+	   
+	   A) guidance command (.data / .code).
+	   
+	   B) instruction command (mov, add, inc etc ..).
+	   
+	   C) something else (illegal). 
+	
+	*/
+	
+	if (!strcmp(command, data_guidance))
 	{
-		if (operand1 == NULL && operand2 == NULL)
+		if (has_symbol)
 		{
-			printf("%s in line %d\n", data_guidance_no_operand, line_number);
+			/* check if this label already exist in symbol table */
 			
-			exit(-1);
-		}
-		
-		if (operand1 != NULL) 
-		{
-			int val = atoi(operand1);
+			bool exist = is_label_exist_in_symbol_table(label_name);
 			
-			if (val == 0)
-			{
-				printf("%s in line %d\n", data_guidance_invalid_number, line_number);
+			if (!exist)
+			{	
+				/* append the the new table to symbol table */
 				
-				exit(-1);
+				label new_label = {label_name, *dc, data_guidance};
+				
+				*(symbol_table_ptr + symbol_table_idx) = new_label;
+				
+				symbol_table_idx++;
 			}
-			
-			word tmp = (word){val};
-			
-			*(dc + dc_index) = tmp;
-			
-			dc_index++;
 		}
-	}
-	else if (!strcmp(instruction, string_guidance))
-	{
-		if (operand1 == NULL && operand2 == NULL)
-		{
-			printf("%s in line %d\n", string_guidance_no_operand, line_number);
-			
-			exit(-1);
-		}
-		
-		/* get all characters in put them into dc array */
-		
-		int str_idx = 0;
-		
-		
-	}
 	
-		
-	if (!is_instruction_valid(instruction))
+		parse_data_guidance_operands(operand1, operand2);
+	}
+	else if (!strcmp(command, string_guidance))
+	{
+		if (has_symbol)
+		{
+			/* check if this label already exist in symbol table */
+			
+			bool exist = is_label_exist_in_symbol_table(label_name);
+			
+			if (!exist)
+			{	
+				/* append the the new table to symbol table */
+				
+				label new_label = {label_name, *dc, string_guidance};
+				
+				*(symbol_table_ptr + symbol_table_idx) = new_label;
+				
+				symbol_table_idx++;
+			}
+		}
+	
+		parse_string_guidance_operands(operand1, operand2);
+	}
+	else if (!is_instruction_valid(command, operand1, operand2)) 
 	{
 		printf("%s in line %d\n", invalid_instruction, line_number);
 		
 		exit(-1);
 	}
-	
-	if (has_symbol)
-	{	
-		/* check if this label already exist in symbol table */
-			
-		bool exist = is_label_exist_in_symbol_table(label_name);
-			
-		if (!exist)
-		{	
-			/* append the the new table to symbol table */
-				
-			label new_label = {label_name, *ic, ".data"};
-				
-			*(symbol_table_ptr + symbol_table_idx) = new_label;
-				
-			symbol_table_idx++;
-		}
+	else
+	{
+		
 	}
-	
-
-	/* now check the token type */
-	
-	
-	else if (!strcmp(instruction, entry_guidance) || !strcmp(instruction, extern_guidance))
+/*		
+	else if (!strcmp(command, entry_guidance) || !strcmp(command, extern_guidance))
 	{
 		
 	} 
-
-	/* identify instruction type */	
-
-	
-
-	/* know instruction */ 		
-	
-		
+	*/	
 }
 

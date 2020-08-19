@@ -21,14 +21,14 @@ int main(int argc, char* argv[])
 
 	if (argc < 2)
 	{
-		printf("ERROR:: please enter asm files\n");
+		printf("%s\n", no_file);
 		
 		return -1;
 	}
 
 	if (!extension_validation(argv, argc))
 	{
-		printf("ERROR:: the input files without asm extension\n");
+		printf("%s\n", no_assembly_file);
 		
 		return -2;
 	}

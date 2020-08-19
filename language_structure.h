@@ -4,7 +4,9 @@
 
 #define __language_structure_h__
 
+#include <stdlib.h>
 #include "command_hash_table.h"
+#include "assembly_errors.h"
 
 #define CODE_DATA_ARR_SIZE 100
 
@@ -23,6 +25,8 @@ static const char string_guidance[] = ".string";
 static const char entry_guidance[] = ".entry";
 
 static const char extern_guidance[] = ".extern";
+
+static int line_number = 0; /* count the lines to report an error in a particular line */
 
 static int* pc; /* program counter to next instruction. all addresses are 32 bit (assume 4 bytes for int) */
 
@@ -104,7 +108,11 @@ static int symbol_table_idx = 0;
 
 bool is_label_exist_in_symbol_table(const char* label_name);
 
-bool is_instruction_valid(const char* instruction);
+bool is_instruction_valid(const char* instruction, const char* operand1, const char* operand2);
+
+void parse_data_guidance_operands(const char* operand1, const char* operand2);
+
+void parse_string_guidance_operands(const char* operand1, const char* operand2);
 
 char* convert_decimal_to_binary(int num);
 

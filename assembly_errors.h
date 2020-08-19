@@ -2,6 +2,10 @@
 
 #define __assembly_errors_h__
 
+static const char no_file[] = "ERROR:: no input file";
+
+static const char no_assembly_file[] = "ERROR:: the input files without asm extension";
+
 static const char label_already_exist[] = "ERROR:: label already exist";
 
 static const char label_spaces_error[]  = "ERROR:: label contain spaces";
@@ -10,9 +14,11 @@ static const char invalid_instruction[] = "ERROR:: invalid instruction";
 
 static const char data_guidance_no_operand[] = "ERROR:: must be at least one argument for data guidance";
 
+static const char data_guidance_no_first_argument[] = "ERROR:: must be first argument in data guidance";
+
 static const char data_guidance_invalid_number[] = "ERROR:: data guidance must contain valid string num";
 
-static const char string_guidance_no_operand[] = "ERROR:: must be at least one argument for string guidance";
+static const char string_guidance_operand[] = "ERROR:: must be exactly one argument for string guidance in first operand";
 
 static const char mov_arguments_error[] = "ERROR:: mov command requires two arguments";
 

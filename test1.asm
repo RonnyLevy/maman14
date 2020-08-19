@@ -1,5 +1,17 @@
-;;;;;;;;
-MOV AL, 1h
-test: MOV CL, 2h
-;;;;;;;;;;;
-MOV DL, 3h
+MAIN: add r3, LIST
+LOOP: prn #48
+	  lea STR, r6
+	  inc r6
+	  mov r3, K
+	  sub r1, K
+	  bne END
+	  cmp k, #6
+	  bne &END
+	  dec K
+	  jmp &LOOP
+END:  stop
+STR:  .string "abcd"
+LIST: .data 6, -9
+	  .data -100
+K:	  .data 31	  
+	  

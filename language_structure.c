@@ -29,6 +29,8 @@ char* convert_decimal_to_binary(int num)
 
 bool is_label_exist_in_symbol_table(const char* label_name)
 {
+	if (label_name == NULL) return false;
+
 	int symbol_table_index = 0;
 	
 	for ( ; symbol_table_index < MAX_LINES_IN_SOURCE_CODE ; symbol_table_index++)
@@ -42,11 +44,116 @@ bool is_label_exist_in_symbol_table(const char* label_name)
 	return false;
 }
 
-bool is_instruction_valid(const char* instruction)
+void parse_data_guidance_operands(const char* operand1, const char* operand2)
 {
-	if      (!strcmp(instruction, MOV))  return true;
+	if (operand1 == NULL && operand2 == NULL)
+	{
+		printf("%s in line %d\n", data_guidance_no_operand, line_number);
+			
+		exit(-1);
+	}
+		
+	if (operand1 == NULL && operand2 != NULL)
+	{
+		printf("%s in line %d\n", data_guidance_no_first_argument, line_number);
+			
+		exit(-1);
+	}
+		
+	int val = atoi(operand1);
+			
+	if (val == 0)
+	{
+		printf("%s in line %d\n", data_guidance_invalid_number, line_number);
+				
+		exit(-1);
+	}
+			
+	word tmp = (word){val};
+			
+	*(dc + dc_index) = tmp;
+			
+	dc_index++;
+		
+	if (operand2 != NULL)
+	{
+		int val = atoi(operand2);
+			
+		if (val == 0)
+		{
+			printf("%s in line %d\n", data_guidance_invalid_number, line_number);
+				
+			exit(-1);
+		}
+			
+		word num = (word){val};
+			
+		*(dc + dc_index) = num;
+			
+		dc_index++;	
+	}
+}
+
+void parse_string_guidance_operands(const char* operand1, const char* operand2)
+{
+	if (operand1 == NULL || operand2 != NULL)
+	{
+		printf("%s\n", string_guidance_operand);
+		
+		exit(-1);
+	}
+	
+	int string_len = strlen(operand1);
+	
+	int idx = 0;
+	
+	for ( ; idx < string_len ; idx++)
+	{
+		word _char = (word){operand1[idx]};
+		
+		*(dc + dc_index) = _char;
+		
+		dc_index++;
+	}
+	
+	word end_string = (word){'\0'};
+	
+	*(dc + dc_index) = end_string;
+	
+	dc_index++; /* plus '\0' */
+}
+
+bool is_instruction_valid(const char* instruction, const char* operand1, const char* operand2)
+{
+	if (!strcmp(instruction, MOV))
+	{
+		/* check if exist two operands */
+	
+		if (operand1 != NULL && operand2 != NULL)
+		{
+			/* check the addresssing type of source and destination operands */
+			
+			/* for source: 0, 1, 3 :*/
+			
+			char first_char = operand1[0];
+			
+			if (first_char == immediate_addressing)
+			{
+				
+			}
+		}
+		else 
+		{
+			return false;
+		}
+	}
 	 
-	else if (!strcmp(instruction, CMP))  return true;
+	else if (!strcmp(instruction, CMP))
+	{
+		
+	}
+	
+	/* TODO */
 	
 	else if (!strcmp(instruction, ADD))  return true;
 	

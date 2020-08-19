@@ -8,15 +8,11 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <ctype.h>
-#include <stdlib.h>
 #include "language_structure.h"
-#include "assembly_errors.h"
 
 #define MAX_LINE_SIZE 80
 
 #define MAX_TOKENS_IN_LINE 4 /* label, command, operand1, operand2 */
-
-static int line_number = 0; /* count the lines to report an error in a particular line */
 
 static const char ASM[] = "asm";
 
