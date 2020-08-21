@@ -121,13 +121,13 @@ bool is_instruction_valid(const char* instruction, const char* operand1, const c
 			{
 				/* check the addresssing type of source and destination operands */
 			
-				/* for source: 0, 1, 3 :*/
+				/* source addressing : 0, 1, 3 :*/
 			
-				if (does_immediate_addressing(operand1))    { return true; }
+				if      (does_immediate_addressing(operand1))       { return true; }
 							
-				else if (!does_direct_addressing(operand1)) { /* */ }
+				else if (does_direct_addressing(operand1))         { /* */ }
 				
-				else if (is_operand_register(operand1))     { return true; }
+				else if (does_direct_register_addressing(operand1)) { return true; }
 				
 				else
 				{
@@ -136,9 +136,18 @@ bool is_instruction_valid(const char* instruction, const char* operand1, const c
 					exit(-1);
 				}
 				
-				/* for destination : */
+				/* destination addressing : 1, 3*/
 				
+				if      (does_direct_addressing(operand2)) { /* */ }
 				
+				else if (does_direct_register_addressing(operand2)) { return true; }
+				
+				else
+				{
+					printf("%s in line %d\n", mov_dst_addressing_error, line_number);
+					
+					exit(-1);
+				}				
 			}
 		}
 		else 
@@ -225,12 +234,24 @@ bool does_immediate_addressing(const char* operand)
 			exit(-1);				
 		}
 		
-		else return true;
+	    return true;
 	}
-	else return false;	
+	
+	return false;	
 }
 
 bool does_direct_addressing(const char* operand)
 {
 	
 }
+
+bool does_relative_addressing(const char* operand)
+{
+
+}
+
+bool does_direct_register_addressing(const char* operand)
+{
+	return is_operand_register(operand);
+}
+
