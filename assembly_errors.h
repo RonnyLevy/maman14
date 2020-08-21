@@ -26,6 +26,8 @@ static const char mov_src_addressing_error[] = "ERROR:: mov command requires onl
 
 static const char mov_dst_addressing_error[] = "ERROR:: mov command requires only direct or register direct for destination addressing";
 
+static const char cmp_arguments_error[] = "ERROR:: cmp command requires two arguments";
+
 static const char cmp_src_addressing_error[] = "ERROR:: cmp command requires only immediate, direct and register direct for source addressing";
 
 static const char cmp_dst_addressing_error[] = "ERROR:: cmp command requires only immediate, direct and register direct for destination addressing";
