@@ -123,20 +123,12 @@ bool is_instruction_valid(const char* instruction, const char* operand1, const c
 			
 				/* for source: 0, 1, 3 :*/
 			
-				if (!does_immediate_addressing(operand1))
-				{
-					printf("%s in line %d\n", mov_immediate_error, line_number);
-						
-					exit(-1);
-				}			
-				else if (!does_direct_addressing(operand1)) /* does direct addressing ? (1) */
-				{
-					
-				}
-				else if (is_operand_register(operand1)) /* does direct register addressing ? (3) */
-				{
-					/* r0, r1, r2, r3, r4, r5, r6, r7 */
-				}
+				if (does_immediate_addressing(operand1))    { return true; }
+							
+				else if (!does_direct_addressing(operand1)) { /* */ }
+				
+				else if (is_operand_register(operand1))     { return true; }
+				
 				else
 				{
 					printf("%s in line %d\n", mov_src_addressing_error, line_number);
@@ -226,11 +218,16 @@ bool does_immediate_addressing(const char* operand)
 					
 		bool is_digit = is_string_int_num(sub_operand);
 					
-		if (is_digit) return true;
+		if (!is_digit)
+		{
+			printf("%s in line %d\n", mov_immediate_error, line_number);
+						
+			exit(-1);				
+		}
 		
-		else       	  return false;
-		
-	}	
+		else return true;
+	}
+	else return false;	
 }
 
 bool does_direct_addressing(const char* operand)
