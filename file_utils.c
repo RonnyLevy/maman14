@@ -99,7 +99,7 @@ void read_file_line_by_line(const char* file_name)
 
 		/* check if line is empty */
 		
-		if (!line_is_empty(buff))
+		if (!is_string_empty(buff))
 		{
 			if (line_size > 0 && (*buff != comment)) 
 			{
@@ -119,18 +119,6 @@ void read_file_line_by_line(const char* file_name)
   	/* file end */
   
   	fclose(fp);
-}
-
-bool line_is_empty(const char* line)
-{
-	while (*line != '\0')
-	{
-		if (!isspace(*line)) return false;
-		
-		line++;
-	}
-	
-	return true;
 }
 
 void line_analysis(const char* line)
@@ -198,11 +186,7 @@ void line_analysis(const char* line)
 		}
 	}
 	
-	int idx = 0;
-	
-	for ( ; idx <  tokens_arr_index ; idx++) printf("loop:: token = %s\n", tokens[idx]);
-	
-	/*tokens_processing(tokens);	
+	tokens_processing(tokens);	
 	
 	/* in the end, clear all for next line */
 	
@@ -215,15 +199,15 @@ void line_analysis(const char* line)
 	tokens_arr_index = 0;
 }
  
-bool tokens_processing(const char* token[])
+bool tokens_processing(const char* tokens[])
 {
-	char* label_name  = token[0];
+	char* label_name  = tokens[0];
 	
-	char* command     = token[1];
+	char* command     = tokens[1];
 	
-	char* operand1    = token[2];
+	char* operand1    = tokens[2];
 	
-	char* operand2    = token[3];
+	char* operand2    = tokens[3];
 	
 	label new_label;
 	
@@ -242,7 +226,7 @@ bool tokens_processing(const char* token[])
 	*/
 	
 	if (!strcmp(command, data_guidance))
-	{
+	{	
 		if (has_symbol)
 		{
 			/* check if this label already exist in symbol table */
@@ -261,7 +245,7 @@ bool tokens_processing(const char* token[])
 			}
 		}
 	
-		parse_data_guidance_operands(operand1, operand2);
+		parse_data_guidance_operands(operand1, operand2, line_number);
 	}
 	else if (!strcmp(command, string_guidance))
 	{
@@ -285,16 +269,15 @@ bool tokens_processing(const char* token[])
 	
 		parse_string_guidance_operands(operand1, operand2);
 	}
-	else if (!is_instruction_valid(command, operand1, operand2)) 
+	else 
 	{
-		printf("%s in line %d\n", invalid_instruction, line_number);
+		int i = 0;
 		
-		exit(-1);
-	}
-	else
-	{
+		for ( ; i < tokens_arr_index ; i++) printf("token = %s\n", tokens[i]);
 		
+		is_instruction_valid(command, operand1, operand2, line_number);
 	}
+	
 /*		
 	else if (!strcmp(command, entry_guidance) || !strcmp(command, extern_guidance))
 	{

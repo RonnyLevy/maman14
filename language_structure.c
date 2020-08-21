@@ -7,26 +7,6 @@ void ic_and_dc_counters_initialization()
 	*dc = (word){0};
 }
 
-char* convert_decimal_to_binary(int num)
-{ 
-	const int size_of_int = sizeof(int); 
-
-    char binary[size_of_int]; 
-   
-    int i = 0; 
-    
-    while (num > 0)
-    {  
-        binary[i] = num % 2; 
-        
-        num = num / 2; 
-        
-        i++; 
-    }
-    
-    return binary; 
-}
-
 bool is_label_exist_in_symbol_table(const char* label_name)
 {
 	if (label_name == NULL) return false;
@@ -35,33 +15,34 @@ bool is_label_exist_in_symbol_table(const char* label_name)
 	
 	for ( ; symbol_table_index < MAX_LINES_IN_SOURCE_CODE ; symbol_table_index++)
 	{
-		if (!strcmp(label_name, *(symbol_table_ptr + symbol_table_index) -> name))
+		char* tmp_lbl = (symbol_table_ptr + symbol_table_index) -> name;
+		
+		if (tmp_lbl != NULL)
 		{
-			return true;
-		}
+			if (!strcmp(label_name, tmp_lbl))
+			{
+				return true;
+			}	
+		}	
 	}
 	
 	return false;
 }
 
-void parse_data_guidance_operands(const char* operand1, const char* operand2)
+void parse_data_guidance_operands(const char* operand1, const char* operand2, const int line_number)
 {
-	if (operand1 == NULL && operand2 == NULL)
+	if (operand1 == NULL)
 	{
-		printf("%s in line %d\n", data_guidance_no_operand, line_number);
+		if (is_string_empty(operand1))
+		{
+			printf("%s in line %d\n", data_guidance_no_first_argument, line_number);
 			
-		exit(-1);
-	}
-		
-	if (operand1 == NULL && operand2 != NULL)
-	{
-		printf("%s in line %d\n", data_guidance_no_first_argument, line_number);
-			
-		exit(-1);
+			exit(-1);
+		}
 	}
 		
 	int val = atoi(operand1);
-			
+					
 	if (val == 0)
 	{
 		printf("%s in line %d\n", data_guidance_invalid_number, line_number);
@@ -77,26 +58,29 @@ void parse_data_guidance_operands(const char* operand1, const char* operand2)
 		
 	if (operand2 != NULL)
 	{
-		int val = atoi(operand2);
-			
-		if (val == 0)
+		if (!is_string_empty(operand2))
 		{
-			printf("%s in line %d\n", data_guidance_invalid_number, line_number);
+			int val = atoi(operand2);
 				
-			exit(-1);
+			if (val == 0)
+			{
+				printf("%s in line %d\n", data_guidance_invalid_number, line_number);
+				
+				exit(-1);
+			}
+			
+			word num = (word){val};
+			
+			*(dc + dc_index) = num;
+			
+			dc_index++;
 		}
-			
-		word num = (word){val};
-			
-		*(dc + dc_index) = num;
-			
-		dc_index++;	
 	}
 }
 
 void parse_string_guidance_operands(const char* operand1, const char* operand2)
 {
-	if (operand1 == NULL || operand2 != NULL)
+	if (!(operand1 != NULL && operand2 == NULL))
 	{
 		printf("%s\n", string_guidance_operand);
 		
@@ -105,8 +89,10 @@ void parse_string_guidance_operands(const char* operand1, const char* operand2)
 	
 	int string_len = strlen(operand1);
 	
-	int idx = 0;
+	if (string_len <= 0) return;
 	
+	int idx = 0;
+		
 	for ( ; idx < string_len ; idx++)
 	{
 		word _char = (word){operand1[idx]};
@@ -123,7 +109,7 @@ void parse_string_guidance_operands(const char* operand1, const char* operand2)
 	dc_index++; /* plus '\0' */
 }
 
-bool is_instruction_valid(const char* instruction, const char* operand1, const char* operand2)
+bool is_instruction_valid(const char* instruction, const char* operand1, const char* operand2, const int line_number)
 {
 	if (!strcmp(instruction, MOV))
 	{
@@ -131,14 +117,35 @@ bool is_instruction_valid(const char* instruction, const char* operand1, const c
 	
 		if (operand1 != NULL && operand2 != NULL)
 		{
-			/* check the addresssing type of source and destination operands */
-			
-			/* for source: 0, 1, 3 :*/
-			
-			char first_char = operand1[0];
-			
-			if (first_char == immediate_addressing)
+			if (!is_string_empty(operand1) && !is_string_empty(operand2))
 			{
+				/* check the addresssing type of source and destination operands */
+			
+				/* for source: 0, 1, 3 :*/
+			
+				if (!does_immediate_addressing(operand1))
+				{
+					printf("%s in line %d\n", mov_immediate_error, line_number);
+						
+					exit(-1);
+				}			
+				else if (!does_direct_addressing(operand1)) /* does direct addressing ? (1) */
+				{
+					
+				}
+				else if (is_operand_register(operand1)) /* does direct register addressing ? (3) */
+				{
+					/* r0, r1, r2, r3, r4, r5, r6, r7 */
+				}
+				else
+				{
+					printf("%s in line %d\n", mov_src_addressing_error, line_number);
+					
+					exit(-1);
+				}
+				
+				/* for destination : */
+				
 				
 			}
 		}
@@ -205,4 +212,28 @@ bool is_operand_register(const char* operand)
 	else if (!strcmp(operand, "r7")) return true;
 	
 	else                             return false;	
+}
+
+bool does_immediate_addressing(const char* operand)
+{
+	char first_char = operand[0];
+
+	if (first_char == immediate_addressing) /* does immediate addressing (0)? */
+	{
+		/* check if appear int num after # */
+					
+		char* sub_operand = get_substring_after_first_char(operand);
+					
+		bool is_digit = is_string_int_num(sub_operand);
+					
+		if (is_digit) return true;
+		
+		else       	  return false;
+		
+	}	
+}
+
+bool does_direct_addressing(const char* operand)
+{
+	
 }

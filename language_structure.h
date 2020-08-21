@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include "command_hash_table.h"
 #include "assembly_errors.h"
+#include "string_utils.h"
 
 #define CODE_DATA_ARR_SIZE 100
 
@@ -26,11 +27,9 @@ static const char entry_guidance[] = ".entry";
 
 static const char extern_guidance[] = ".extern";
 
-static int line_number = 0; /* count the lines to report an error in a particular line */
+static int line_number = 1; /* count the lines to report an error in a particular line */
 
 static int* pc; /* program counter to next instruction. all addresses are 32 bit (assume 4 bytes for int) */
-
-typedef enum { false, true } bool;
 
 typedef enum { r0, r1, r2, r3, r4, r5, r6, r7 } _register;
 
@@ -108,15 +107,21 @@ static int symbol_table_idx = 0;
 
 bool is_label_exist_in_symbol_table(const char* label_name);
 
-bool is_instruction_valid(const char* instruction, const char* operand1, const char* operand2);
+bool is_instruction_valid(const char* instruction, const char* operand1, const char* operand2, const int line_number);
 
-void parse_data_guidance_operands(const char* operand1, const char* operand2);
+void parse_data_guidance_operands(const char* operand1, const char* operand2, const int line_number);
 
 void parse_string_guidance_operands(const char* operand1, const char* operand2);
 
-char* convert_decimal_to_binary(int num);
-
 bool is_operand_register(const char* operand); /* check if operand he's one of the eight registers */
+
+bool does_immediate_addressing(const char* operand);
+
+bool does_direct_addressing(const char* operand);
+
+bool does_relative_addressing(const char* operand);
+
+bool does_direct_register_addressing(const char* operand);
 
 void build_word_machine_code(); /* |op-code||source addressing||source register|||destination addressing||destination register||fucnt||A||R||E|
 

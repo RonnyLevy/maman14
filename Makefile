@@ -12,9 +12,9 @@ CC = gcc
 
 TARGET = assembler
 
-DEPS = file_utils.h language_structure.h command_hash_table.h
+DEPS = file_utils.h language_structure.h command_hash_table.h string_utils.h
 
-OBJ = main.o file_utils.o language_structure.o command_hash_table.o
+OBJ = main.o file_utils.o language_structure.o command_hash_table.o string_utils.o
 
 CFLAGS = -Wall -ansi -pedantic -I.
 
