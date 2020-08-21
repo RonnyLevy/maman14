@@ -5,6 +5,7 @@
 #define __language_structure_h__
 
 #include <stdlib.h>
+#include <string.h>
 #include "command_hash_table.h"
 #include "assembly_errors.h"
 #include "string_utils.h"
@@ -29,11 +30,17 @@ static const char extern_guidance[] = ".extern";
 
 static int line_number = 1; /* count the lines to report an error in a particular line */
 
+static bool error_in_source_code = false; /* this flag will be set if and only if found some error in source code */
+
 static int* pc; /* program counter to next instruction. all addresses are 32 bit (assume 4 bytes for int) */
 
 typedef enum { r0, r1, r2, r3, r4, r5, r6, r7 } _register;
 
 typedef enum {immediate, direct, relative, direct_register} addressing_type;
+
+static addressing_type operand1_addressing_type;
+
+static addressing_type operand2_addressing_type;
 
 /* program status word */
 

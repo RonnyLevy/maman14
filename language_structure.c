@@ -37,7 +37,9 @@ void parse_data_guidance_operands(const char* operand1, const char* operand2, co
 		{
 			printf("%s in line %d\n", data_guidance_no_first_argument, line_number);
 			
-			exit(-1);
+			error_in_source_code = true;
+			
+			return;
 		}
 	}
 		
@@ -47,7 +49,9 @@ void parse_data_guidance_operands(const char* operand1, const char* operand2, co
 	{
 		printf("%s in line %d\n", data_guidance_invalid_number, line_number);
 				
-		exit(-1);
+		error_in_source_code = true;
+			
+		return;
 	}
 			
 	word tmp = (word){val};
@@ -66,7 +70,9 @@ void parse_data_guidance_operands(const char* operand1, const char* operand2, co
 			{
 				printf("%s in line %d\n", data_guidance_invalid_number, line_number);
 				
-				exit(-1);
+				error_in_source_code = true;
+			
+				return false;
 			}
 			
 			word num = (word){val};
@@ -84,7 +90,9 @@ void parse_string_guidance_operands(const char* operand1, const char* operand2)
 	{
 		printf("%s\n", string_guidance_operand);
 		
-		exit(-1);
+		error_in_source_code = true;
+			
+		return;
 	}
 	
 	int string_len = strlen(operand1);
@@ -111,6 +119,16 @@ void parse_string_guidance_operands(const char* operand1, const char* operand2)
 
 bool is_instruction_valid(const char* instruction, const char* operand1, const char* operand2, const int line_number)
 {
+	printf("**************************************\n");
+
+	printf("instruction = %s\n", instruction);
+	
+	printf("operand1 = %s\n", operand1);
+	
+	printf("operand2 = %s\n", operand2);
+
+	printf("**************************************\n");
+
 	if (!strcmp(instruction, MOV))
 	{
 		/* check if exist two operands */
@@ -125,7 +143,7 @@ bool is_instruction_valid(const char* instruction, const char* operand1, const c
 			
 				if      (does_immediate_addressing(operand1))       { return true; }
 							
-				else if (does_direct_addressing(operand1))         { /* */ }
+				else if (does_direct_addressing(operand1))          { return true; }
 				
 				else if (does_direct_register_addressing(operand1)) { return true; }
 				
@@ -133,12 +151,14 @@ bool is_instruction_valid(const char* instruction, const char* operand1, const c
 				{
 					printf("%s in line %d\n", mov_src_addressing_error, line_number);
 					
-					exit(-1);
+					error_in_source_code = true;
+			
+					return false;
 				}
 				
 				/* destination addressing : 1, 3*/
 				
-				if      (does_direct_addressing(operand2)) { /* */ }
+				if      (does_direct_addressing(operand2))          { return true; }
 				
 				else if (does_direct_register_addressing(operand2)) { return true; }
 				
@@ -146,19 +166,25 @@ bool is_instruction_valid(const char* instruction, const char* operand1, const c
 				{
 					printf("%s in line %d\n", mov_dst_addressing_error, line_number);
 					
-					exit(-1);
+					error_in_source_code = true;
+			
+					return false;
 				}				
 			}
 			
 			printf("%s in line %d\n", mov_arguments_error, line_number);
 					
-			exit(-1);
+			error_in_source_code = true;
+			
+			return false;
 		}
 		else 
 		{
 			printf("%s in line %d\n", mov_arguments_error, line_number);
 					
-			exit(-1);
+			error_in_source_code = true;
+			
+			return false;
 		}
 	}
 	 
@@ -172,7 +198,7 @@ bool is_instruction_valid(const char* instruction, const char* operand1, const c
 			
 			if      (does_immediate_addressing(operand1))       { return true; }
 							
-			else if (does_direct_addressing(operand1))         { /* */ }
+			else if (does_direct_addressing(operand1))          { return true; }
 				
 			else if (does_direct_register_addressing(operand1)) { return true; }
 				
@@ -180,14 +206,16 @@ bool is_instruction_valid(const char* instruction, const char* operand1, const c
 			{
 				printf("%s in line %d\n", mov_src_addressing_error, line_number);
 					
-				exit(-1);
+				error_in_source_code = true;
+			
+				return false;
 			}
 				
 			/* destination addressing : 0, 1, 3*/
 				
 			if      (does_immediate_addressing(operand2))       { return true; }
 							
-			else if (does_direct_addressing(operand2))          { /* */ }
+			else if (does_direct_addressing(operand2))          { return true; }
 				
 			else if (does_direct_register_addressing(operand2)) { return true; }
 				
@@ -195,26 +223,202 @@ bool is_instruction_valid(const char* instruction, const char* operand1, const c
 			{
 				printf("%s in line %d\n", cmp_arguments_error, line_number);
 					
-				exit(-1);
+				error_in_source_code = true;
+			
+				return false;
 			}
 		}
 		else 
 		{
 			printf("%s in line %d\n", cmp_arguments_error, line_number);
 					
-			exit(-1);
+			error_in_source_code = true;
+			
+			return false;
+		}
+	}
+	
+	else if (!strcmp(instruction, ADD))
+	{
+		if (operand1 != NULL && operand2 != NULL)
+		{
+			if (!is_string_empty(operand1) && !is_string_empty(operand2))
+			{
+				/* check the addresssing type of source and destination operands */
+			
+				/* source addressing : 0, 1, 3 :*/
+				
+				if      (does_immediate_addressing(operand1))       { return true; }
+							
+				else if (does_direct_addressing(operand1))          { return true; }
+				
+				else if (does_direct_register_addressing(operand1)) { return true; }
+				
+				else
+				{
+					printf("%s in line %d\n", add_src_addressing_error, line_number);
+					
+					error_in_source_code = true;
+			
+					return false;
+				}	
+				
+				/* destination addressing: 1, 3*/
+				
+				if      (does_direct_addressing(operand2))          { return true; }
+				
+				else if (does_direct_register_addressing(operand2)) { return true; }
+				
+				else
+				{
+					printf("%s in line %d\n", add_dst_addressing_error, line_number);
+					
+					error_in_source_code = true;
+			
+					return false;
+				}	
+			}
+			
+			printf("%s in line %d\n", add_arguments_error, line_number);
+					
+			error_in_source_code = true;
+			
+			return false;
+		}
+		
+		printf("%s in line %d\n", add_arguments_error, line_number);
+					
+		error_in_source_code = true;
+			
+		return false;
+	}
+	
+	else if (!strcmp(instruction, SUB))
+	{
+		if (operand1 != NULL && operand2 != NULL)
+		{
+			if (!is_string_empty(operand1) && !is_string_empty(operand2))
+			{
+				/* check the addresssing type of source and destination operands */
+			
+				/* source addressing : 0, 1, 3 :*/
+				
+				if      (does_immediate_addressing(operand1))       { return true; }
+							
+				else if (does_direct_addressing(operand1))          { return true; }
+				
+				else if (does_direct_register_addressing(operand1)) { return true; }
+				
+				else
+				{
+					printf("%s in line %d\n", sub_src_addressing_error, line_number);
+					
+					error_in_source_code = true;
+			
+					return false;
+				}	
+				
+				/* destination addressing: 1, 3*/
+				
+				if      (does_direct_addressing(operand2))          { return true; }
+				
+				else if (does_direct_register_addressing(operand2)) { return true; }
+				
+				else
+				{
+					printf("%s in line %d\n", sub_dst_addressing_error, line_number);
+					
+					error_in_source_code = true;
+			
+					return false;
+				}	
+			}
+			
+			printf("%s in line %d\n", sub_arguments_error, line_number);
+					
+			error_in_source_code = true;
+			
+			return false;
+		}
+		
+		printf("%s in line %d\n", sub_arguments_error, line_number);
+					
+		error_in_source_code = true;
+			
+		return false;
+	}
+	
+	else if (!strcmp(instruction, LEA))
+	{
+		if (operand1 != NULL && operand2 != NULL)
+		{
+			if (!is_string_empty(operand1) && !is_string_empty(operand2))
+			{
+				/* check the addresssing type of source and destination operands */
+			
+				/* source addressing : 1 */
+				
+				if (does_direct_addressing(operand1))               { return true; }
+				
+				else
+				{
+					printf("%s in line %d\n", lea_src_addressing_error, line_number);
+					
+					error_in_source_code = true;
+			
+					return false;
+				}
+				
+				/* destination addressing: 1, 3 */
+				
+				if (does_direct_addressing(operand2))               { return true; }
+				
+				else if (does_direct_register_addressing(operand1)) { return true; }
+				
+				else
+				{
+					printf("%s in line %d\n", sub_src_addressing_error, line_number);
+					
+					error_in_source_code = true;
+			
+					return false;
+				}	
+			}
+			
+		}
+	} 
+	
+	else if (!strcmp(instruction, CLR))
+	{
+		/* The command write like this: clr r2. r2 is destination (operand2).
+		
+		   Because our definition of token assume destination after comma, we will refer to operand1 as a destination and
+		   
+		   operand2 not exist. 
+		*/
+		
+		if ((operand1 != NULL && !is_string_empty(operand1)) && (operand1 == NULL || is_string_empty(operand2)))
+		{
+			if (is_string_int_num(operand1) || strchr(operand1, ' ') != NULL)
+			{
+				printf("%s in line %d\n", clr_src_addressing_error, line_number);
+					
+				error_in_source_code = true;
+			
+				return false;
+			}	
+		}
+		else
+		{
+			printf("%s in line %d\n", clr_src_addressing_error, line_number);
+					
+			error_in_source_code = true;
+			
+			return false;
 		}
 	}
 	
 	/* TODO */
-	
-	else if (!strcmp(instruction, ADD))  return true;
-	
-	else if (!strcmp(instruction, SUB))  return true;
-	
-	else if (!strcmp(instruction, LEA))  return true; 
-	
-	else if (!strcmp(instruction, CLR))  return true;
 	
 	else if (!strcmp(instruction, NOT))  return true;
 	
@@ -234,7 +438,7 @@ bool is_instruction_valid(const char* instruction, const char* operand1, const c
 	
 	else if (!strcmp(instruction, RTS))  return true;
 	
-	else if (!strcmp(instruction, STOP)) return true;
+	else if (!strcmp(instruction, STOP)) return false;
 	
 	else                                 return false;
 }
@@ -276,7 +480,9 @@ bool does_immediate_addressing(const char* operand)
 		{
 			printf("%s in line %d\n", mov_immediate_error, line_number);
 						
-			exit(-1);				
+			error_in_source_code = true;
+			
+			return false;				
 		}
 		
 	    return true;
@@ -287,12 +493,38 @@ bool does_immediate_addressing(const char* operand)
 
 bool does_direct_addressing(const char* operand)
 {
+	/* This addressing types, will be reflected in the appearance of a label.
 	
+	   It is possible that the label at this time, is not yet in the label table, because it will only be defined in a few more 		
+	   lines.
+	   
+	   At first running, it is still not possible to know if this is really a label.
+
+	   Therefore, suppose yes (if of course the string itself is legal), and only in the second passage we can get 
+	   	
+	   more details about it.
+	   
+	   label must start in char (no number or _) and cannot equal to keyword in our lang.
+	
+	*/	
+	
+	char first_char = operand[0];
+	
+	if (isdigit(first_char) || strchr(operand, ' ') != NULL)
+	{
+		printf("%d in line %d\n", immediate_addressing_error, line_number);
+		
+		error_in_source_code = true;
+			
+		return false;
+	}
+	
+	return true;	
 }
 
 bool does_relative_addressing(const char* operand)
 {
-
+	
 }
 
 bool does_direct_register_addressing(const char* operand)

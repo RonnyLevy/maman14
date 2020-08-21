@@ -269,20 +269,25 @@ bool tokens_processing(const char* tokens[])
 	
 		parse_string_guidance_operands(operand1, operand2);
 	}
-	else 
+	else if (!strcmp(command, entry_guidance) || !strcmp(command, extern_guidance))
+	{
+	  	/* TODO */	
+	}
+	else if (is_instruction_valid(command, operand1, operand2, line_number))
 	{
 		int i = 0;
 		
 		for ( ; i < tokens_arr_index ; i++) printf("token = %s\n", tokens[i]);
 		
-		is_instruction_valid(command, operand1, operand2, line_number);
-	}
-	
-/*		
-	else if (!strcmp(command, entry_guidance) || !strcmp(command, extern_guidance))
-	{
 		
-	} 
-	*/	
+	}
+	else
+	{
+		printf("%s in line %d\n", no_legal_command, line_number);
+		
+		error_in_source_code = true;
+			
+		return false;		
+	}	
 }
 

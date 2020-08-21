@@ -18,6 +18,8 @@ static const char data_guidance_invalid_number[] = "ERROR:: data guidance must c
 
 static const char string_guidance_operand[] = "ERROR:: must be exactly one argument for string guidance in first operand";
 
+static const char immediate_addressing_error[] = "ERROR:: immediate addressing contain illegal label"; 
+
 static const char mov_arguments_error[] = "ERROR:: mov command requires two arguments";
 
 static const char mov_immediate_error[] = "ERROR:: mov immediate addressing must contain integar number after #";
@@ -36,9 +38,13 @@ static const char add_src_addressing_error[] = "ERROR:: add command requires onl
 
 static const char add_dst_addressing_error[] = "ERROR:: add command requires only direct and register direct for destination addressing";
 
+static const char add_arguments_error[] = "ERROR:: add command requires two arguments";
+
 static const char sub_src_addressing_error[] = "ERROR:: sub command requires only immediate, direct and register direct for source addressing";
 
 static const char sub_dst_addressing_error[] = "ERROR:: sub command requires only direct and register direct for destination addressing";
+
+static const char sub_arguments_error[] = "ERROR:: sub command requires two arguments";
 
 static const char lea_src_addressing_error[] = "ERROR:: lea command requires only direct for source addressing";
 
@@ -87,6 +93,8 @@ static const char rts_dst_addressing_error[] = "ERROR:: rts command not requires
 static const char stop_src_addressing_error[] = "ERROR:: stop command not requires source operand";
 
 static const char stop_dst_addressing_error[] = "ERROR:: stop command not requires destination operand";
+
+static const char no_legal_command[] = "ERROR:: illegal command";
 
 static const char general_syntax_error[] = "ERROR:: syntax error";
 
