@@ -36,7 +36,7 @@ static int* pc; /* program counter to next instruction. all addresses are 32 bit
 
 typedef enum { r0, r1, r2, r3, r4, r5, r6, r7 } _register;
 
-typedef enum {immediate, direct, relative, direct_register} addressing_type;
+typedef enum {immediate, direct, relative, direct_register} addressing_type; /* 0, 1, 2, 3 */
 
 static addressing_type operand1_addressing_type;
 
@@ -114,7 +114,7 @@ static int symbol_table_idx = 0;
 
 bool is_label_exist_in_symbol_table(const char* label_name);
 
-bool is_instruction_valid(const char* instruction, const char* operand1, const char* operand2, const int line_number);
+bool is_instruction_valid(const char* instruction, const char* operand1, const char* operand2, int operand1_addressing, int operand2_addressing, const int line_number); /* operand1/2_addressing equal to 0, 1, 2 or 3*/
 
 void parse_data_guidance_operands(const char* operand1, const char* operand2, const int line_number);
 

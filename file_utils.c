@@ -213,6 +213,10 @@ bool tokens_processing(const char* tokens[])
 	
 	label* new_label_ptr = &new_label; /* for filling label (if exist) */
 	
+	int operand1_addressing = -1; /* defautl value, until the test will yield a different value */
+	 
+	int operand2_addressing = -1; /* defautl value, until the test will yield a different value */
+	
 	/* The most important token now is token[1]. try to identify which kind of type instruction is.
 	
 	   There are three posibilities options: 
@@ -273,7 +277,7 @@ bool tokens_processing(const char* tokens[])
 	{
 	  	/* TODO */	
 	}
-	else if (is_instruction_valid(command, operand1, operand2, line_number))
+	else if (is_instruction_valid(command, operand1, operand2, operand1_addressing, operand2_addressing, line_number))
 	{
 		int i = 0;
 		

@@ -14,4 +14,6 @@ char* get_substring_after_first_char(const char* operand);
 
 bool is_string_int_num(const char* str);
 
+void remove_trailing_spaces(char* str);
+
 #endif

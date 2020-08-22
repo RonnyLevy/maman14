@@ -36,3 +36,22 @@ bool is_string_int_num(const char* str)
 	
 	return true;
 }
+
+void remove_trailing_spaces(char* str) 
+{
+	int index = -1;
+
+    int i = 0;
+    
+    while (str[i] != '\0')
+    {
+        if (str[i] != ' ' && str[i] != '\t' && str[i] != '\n')
+        {
+            index = i;
+        }
+
+        i++;
+    }
+
+    str[index + 1] = '\0';
+}

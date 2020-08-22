@@ -117,17 +117,9 @@ void parse_string_guidance_operands(const char* operand1, const char* operand2)
 	dc_index++; /* plus '\0' */
 }
 
-bool is_instruction_valid(const char* instruction, const char* operand1, const char* operand2, const int line_number)
+bool is_instruction_valid(const char* instruction, const char* operand1, const char* operand2, int operand1_addressing, int operand2_addressing, const int line_number)
 {
-	printf("**************************************\n");
-
-	printf("instruction = %s\n", instruction);
-	
-	printf("operand1 = %s\n", operand1);
-	
-	printf("operand2 = %s\n", operand2);
-
-	printf("**************************************\n");
+	remove_trailing_spaces(instruction);
 
 	if (!strcmp(instruction, MOV))
 	{
@@ -141,11 +133,28 @@ bool is_instruction_valid(const char* instruction, const char* operand1, const c
 			
 				/* source addressing : 0, 1, 3 :*/
 			
-				if      (does_immediate_addressing(operand1))       { return true; }
+				if  (does_immediate_addressing(operand1))
+				{
+					operand1_addressing = 0;
+					
+					error_in_source_code = false;
+					
+					
+				}
 							
-				else if (does_direct_addressing(operand1))          { return true; }
+				else if (does_direct_addressing(operand1))
+				{
+					operand1_addressing = 1;
+					
+					return true;
+				}
 				
-				else if (does_direct_register_addressing(operand1)) { return true; }
+				else if (does_direct_register_addressing(operand1))
+				{
+					operand1_addressing = 3;
+					
+					return true;
+				}
 				
 				else
 				{
@@ -438,7 +447,7 @@ bool is_instruction_valid(const char* instruction, const char* operand1, const c
 	
 	else if (!strcmp(instruction, RTS))  return true;
 	
-	else if (!strcmp(instruction, STOP)) return false;
+	else if (!strcmp(instruction, STOP)) return true;
 	
 	else                                 return false;
 }
@@ -524,7 +533,23 @@ bool does_direct_addressing(const char* operand)
 
 bool does_relative_addressing(const char* operand)
 {
+	char first_char = operand[0];
+
+	if (first_char == relative_addresssing)
+	{
+		if (isdigit(operand[1]) || strchr(operand, ' ') != NULL)
+		{
+			printf("%d in line %d\n", immediate_addressing_error, line_number);
+		
+			error_in_source_code = true;
+			
+			return false;
+		}
+		
+		return true;		
+	}
 	
+	return false;	
 }
 
 bool does_direct_register_addressing(const char* operand)
