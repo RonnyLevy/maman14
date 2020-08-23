@@ -117,12 +117,14 @@ void parse_string_guidance_operands(const char* operand1, const char* operand2)
 	dc_index++; /* plus '\0' */
 }
 
-bool is_instruction_valid(const char* instruction, const char* operand1, const char* operand2, int operand1_addressing, int operand2_addressing, const int line_number)
+bool is_instruction_valid(const char* instruction, const char* operand1, const char* operand2, addressing_type* operand1_addressing_type, addressing_type* operand2_addressing_type, const int line_number)
 {
 	remove_trailing_spaces(instruction);
 
 	if (!strcmp(instruction, MOV))
 	{
+		printf("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\n");
+	
 		/* check if exist two operands */
 	
 		if (operand1 != NULL && operand2 != NULL)
@@ -131,67 +133,76 @@ bool is_instruction_valid(const char* instruction, const char* operand1, const c
 			{
 				/* check the addresssing type of source and destination operands */
 			
-				/* source addressing : 0, 1, 3 :*/
+				/* source addressing : 0, 1, 3 */
 			
-				if  (does_immediate_addressing(operand1))
+				if (does_immediate_addressing(operand1))
 				{
-					operand1_addressing = 0;
-					
-					error_in_source_code = false;
-					
-					
+					*operand1_addressing_type = immediate;
 				}
 							
 				else if (does_direct_addressing(operand1))
 				{
-					operand1_addressing = 1;
-					
-					return true;
+					*operand1_addressing_type = direct;
 				}
 				
 				else if (does_direct_register_addressing(operand1))
 				{
-					operand1_addressing = 3;
-					
-					return true;
+					*operand1_addressing_type = direct_register;
 				}
 				
 				else
 				{
 					printf("%s in line %d\n", mov_src_addressing_error, line_number);
 					
-					error_in_source_code = true;
+					command_not_valid();
 			
 					return false;
 				}
 				
-				/* destination addressing : 1, 3*/
+				/* destination addressing : 1, 3 */
 				
-				if      (does_direct_addressing(operand2))          { return true; }
+				if (does_direct_addressing(operand2))
+				{
+					*operand2_addressing_type = direct;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
 				
-				else if (does_direct_register_addressing(operand2)) { return true; }
+				else if (does_direct_register_addressing(operand2))
+				{
+					*operand2_addressing_type = direct_register;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
 				
 				else
 				{
 					printf("%s in line %d\n", mov_dst_addressing_error, line_number);
 					
-					error_in_source_code = true;
-			
+					command_not_valid();
+					
 					return false;
 				}				
 			}
 			
-			printf("%s in line %d\n", mov_arguments_error, line_number);
-					
-			error_in_source_code = true;
-			
-			return false;
+			else
+			{
+				printf("%s in line %d\n", mov_arguments_error, line_number);
+				
+				command_not_valid();
+				
+				return false;
+			}
 		}
 		else 
 		{
 			printf("%s in line %d\n", mov_arguments_error, line_number);
-					
-			error_in_source_code = true;
+			
+			command_not_valid();
 			
 			return false;
 		}
@@ -199,40 +210,72 @@ bool is_instruction_valid(const char* instruction, const char* operand1, const c
 	 
 	else if (!strcmp(instruction, CMP))
 	{
+		printf("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee\n");
+	
 		if (operand1 != NULL && operand2 != NULL)
 		{
 			/* check the addresssing type of source and destination operands */
 			
-			/* source addressing : 0, 1, 3 :*/
+			/* source addressing : 0, 1, 3 */
 			
-			if      (does_immediate_addressing(operand1))       { return true; }
+			if (does_immediate_addressing(operand1))
+			{
+				*operand1_addressing_type = immediate;
+			}
 							
-			else if (does_direct_addressing(operand1))          { return true; }
+			else if (does_direct_addressing(operand1))
+			{
+				*operand1_addressing_type = direct;
+			}
 				
-			else if (does_direct_register_addressing(operand1)) { return true; }
+			else if (does_direct_register_addressing(operand1))
+			{
+				*operand1_addressing_type = direct_register;
+			}
 				
 			else
 			{
-				printf("%s in line %d\n", mov_src_addressing_error, line_number);
+				printf("%s in line %d\n", cmp_src_addressing_error, line_number);
 					
-				error_in_source_code = true;
+				command_not_valid();
 			
 				return false;
 			}
 				
-			/* destination addressing : 0, 1, 3*/
+			/* destination addressing : 0, 1, 3 */
 				
-			if      (does_immediate_addressing(operand2))       { return true; }
+			if (does_immediate_addressing(operand2))
+			{
+				*operand2_addressing_type = immediate;
+				
+				error_in_source_code = false;
+					
+				return true;
+			}
 							
-			else if (does_direct_addressing(operand2))          { return true; }
+			else if (does_direct_addressing(operand2))
+			{
+				*operand2_addressing_type = direct;
 				
-			else if (does_direct_register_addressing(operand2)) { return true; }
+				error_in_source_code = false;
+					
+				return true;
+			}
+				
+			else if (does_direct_register_addressing(operand2))
+			{
+				*operand2_addressing_type = direct_register;
+				
+				error_in_source_code = false;
+					
+				return true;	
+			}
 				
 			else
 			{
 				printf("%s in line %d\n", cmp_arguments_error, line_number);
 					
-				error_in_source_code = true;
+				command_not_valid();
 			
 				return false;
 			}
@@ -241,7 +284,7 @@ bool is_instruction_valid(const char* instruction, const char* operand1, const c
 		{
 			printf("%s in line %d\n", cmp_arguments_error, line_number);
 					
-			error_in_source_code = true;
+			command_not_valid();
 			
 			return false;
 		}
@@ -249,6 +292,8 @@ bool is_instruction_valid(const char* instruction, const char* operand1, const c
 	
 	else if (!strcmp(instruction, ADD))
 	{
+		printf("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww\n");
+	
 		if (operand1 != NULL && operand2 != NULL)
 		{
 			if (!is_string_empty(operand1) && !is_string_empty(operand2))
@@ -257,108 +302,171 @@ bool is_instruction_valid(const char* instruction, const char* operand1, const c
 			
 				/* source addressing : 0, 1, 3 :*/
 				
-				if      (does_immediate_addressing(operand1))       { return true; }
+				if (does_immediate_addressing(operand1))
+				{
+					*operand1_addressing_type = immediate;
+				}
 							
-				else if (does_direct_addressing(operand1))          { return true; }
+				else if (does_direct_addressing(operand1))
+				{
+					*operand1_addressing_type = direct;
+				}
 				
-				else if (does_direct_register_addressing(operand1)) { return true; }
+				else if (does_direct_register_addressing(operand1))
+				{
+					*operand1_addressing_type = direct_register;
+				}
 				
 				else
 				{
 					printf("%s in line %d\n", add_src_addressing_error, line_number);
 					
-					error_in_source_code = true;
+					command_not_valid();
 			
 					return false;
 				}	
 				
-				/* destination addressing: 1, 3*/
+				/* destination addressing: 1, 3 */
 				
-				if      (does_direct_addressing(operand2))          { return true; }
+				if (does_direct_addressing(operand2))
+				{
+					*operand2_addressing_type = direct;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
 				
-				else if (does_direct_register_addressing(operand2)) { return true; }
+				else if (does_direct_register_addressing(operand2))
+				{
+					*operand2_addressing_type = direct_register;
+					
+					error_in_source_code = false;
+					
+					return true;	
+				}
 				
 				else
 				{
 					printf("%s in line %d\n", add_dst_addressing_error, line_number);
 					
-					error_in_source_code = true;
+					command_not_valid();
 			
 					return false;
 				}	
 			}
 			
+			else
+			{
+				printf("%s in line %d\n", add_arguments_error, line_number);
+					
+				command_not_valid();
+			
+				return false;
+			}
+		}
+		
+		else
+		{
 			printf("%s in line %d\n", add_arguments_error, line_number);
 					
-			error_in_source_code = true;
+			command_not_valid();
 			
 			return false;
 		}
-		
-		printf("%s in line %d\n", add_arguments_error, line_number);
-					
-		error_in_source_code = true;
-			
-		return false;
 	}
 	
 	else if (!strcmp(instruction, SUB))
 	{
+		printf("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq\n");
+	
 		if (operand1 != NULL && operand2 != NULL)
 		{
 			if (!is_string_empty(operand1) && !is_string_empty(operand2))
 			{
 				/* check the addresssing type of source and destination operands */
 			
-				/* source addressing : 0, 1, 3 :*/
+				/* source addressing : 0, 1, 3 */
 				
-				if      (does_immediate_addressing(operand1))       { return true; }
+				if (does_immediate_addressing(operand1))
+				{
+					*operand1_addressing_type = immediate;
+				}
 							
-				else if (does_direct_addressing(operand1))          { return true; }
+				else if (does_direct_addressing(operand1))
+				{
+					*operand1_addressing_type = direct;
+				}
 				
-				else if (does_direct_register_addressing(operand1)) { return true; }
+				else if (does_direct_register_addressing(operand1))
+				{
+					*operand1_addressing_type = direct_register;
+				}
 				
 				else
 				{
 					printf("%s in line %d\n", sub_src_addressing_error, line_number);
 					
-					error_in_source_code = true;
+					command_not_valid();
 			
 					return false;
 				}	
 				
-				/* destination addressing: 1, 3*/
+				/* destination addressing: 1, 3 */
 				
-				if      (does_direct_addressing(operand2))          { return true; }
+				if (does_direct_addressing(operand2))
+				{
+					*operand2_addressing_type = direct;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
 				
-				else if (does_direct_register_addressing(operand2)) { return true; }
+				else if (does_direct_register_addressing(operand2))
+				{
+					*operand2_addressing_type = direct_register;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
 				
 				else
 				{
 					printf("%s in line %d\n", sub_dst_addressing_error, line_number);
 					
-					error_in_source_code = true;
+					command_not_valid();
 			
 					return false;
 				}	
 			}
 			
-			printf("%s in line %d\n", sub_arguments_error, line_number);
+			else
+			{
+				printf("%s in line %d\n", sub_arguments_error, line_number);	
 					
-			error_in_source_code = true;
+				command_not_valid();
+			
+				return false;
+			}
+			
+		}
+		
+		else
+		{
+			printf("%s in line %d\n", sub_arguments_error, line_number);	
+					
+			command_not_valid();
 			
 			return false;
 		}
-		
-		printf("%s in line %d\n", sub_arguments_error, line_number);
-					
-		error_in_source_code = true;
-			
-		return false;
 	}
 	
 	else if (!strcmp(instruction, LEA))
 	{
+		printf("+++++++++++++++++++++++++++++++++++++++++++++++++\n");
+		
 		if (operand1 != NULL && operand2 != NULL)
 		{
 			if (!is_string_empty(operand1) && !is_string_empty(operand2))
@@ -367,38 +475,74 @@ bool is_instruction_valid(const char* instruction, const char* operand1, const c
 			
 				/* source addressing : 1 */
 				
-				if (does_direct_addressing(operand1))               { return true; }
+				if (does_direct_addressing(operand1))
+				{
+					*operand1_addressing_type = immediate;
+				}
 				
 				else
 				{
 					printf("%s in line %d\n", lea_src_addressing_error, line_number);
 					
-					error_in_source_code = true;
+					command_not_valid();
 			
 					return false;
 				}
 				
 				/* destination addressing: 1, 3 */
 				
-				if (does_direct_addressing(operand2))               { return true; }
+				if (does_direct_addressing(operand2))
+				{
+					*operand2_addressing_type = direct;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
 				
-				else if (does_direct_register_addressing(operand1)) { return true; }
+				else if (does_direct_register_addressing(operand2))
+				{
+					*operand2_addressing_type = direct_register;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
 				
 				else
 				{
-					printf("%s in line %d\n", sub_src_addressing_error, line_number);
+					printf("%s in line %d\n", lea_src_addressing_error, line_number);
 					
-					error_in_source_code = true;
+					command_not_valid();
 			
 					return false;
 				}	
 			}
 			
+			else
+			{
+				printf("%s in line %d\n", lea_arguments_error, line_number);
+					
+				command_not_valid();
+			
+				return false;
+			}
+		}
+		
+		else
+		{
+			printf("%s in line %d\n", lea_arguments_error, line_number);
+					
+			command_not_valid();
+			
+			return false;
 		}
 	} 
 	
 	else if (!strcmp(instruction, CLR))
 	{
+		printf("---------------------------------------------------\n");
+	
 		/* The command write like this: clr r2. r2 is destination (operand2).
 		
 		   Because our definition of token assume destination after comma, we will refer to operand1 as a destination and
@@ -406,50 +550,655 @@ bool is_instruction_valid(const char* instruction, const char* operand1, const c
 		   operand2 not exist. 
 		*/
 		
-		if ((operand1 != NULL && !is_string_empty(operand1)) && (operand1 == NULL || is_string_empty(operand2)))
+		if ((operand1 != NULL && !is_string_empty(operand1)) && (operand2 == NULL || is_string_empty(operand2)))
 		{
 			if (is_string_int_num(operand1) || strchr(operand1, ' ') != NULL)
 			{
-				printf("%s in line %d\n", clr_src_addressing_error, line_number);
+				printf("%s in line %d\n", clr_dst_addressing_error, line_number);
 					
-				error_in_source_code = true;
+				command_not_valid();
 			
 				return false;
+			}
+			
+			else
+			{
+				/* recognize addressing type */
+				
+				/* destination addressing: 1, 3 */
+				
+				if (does_direct_addressing(operand1))
+				{
+					*operand2_addressing_type = direct;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
+				
+				else if (does_direct_register_addressing(operand1))
+				{
+					*operand2_addressing_type = direct_register;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
+				
+				else
+				{
+					printf("%s in line %d\n", clr_argument_error, line_number);
+					
+					command_not_valid();
+			
+					return false;
+				}	
 			}	
 		}
+		
 		else
 		{
-			printf("%s in line %d\n", clr_src_addressing_error, line_number);
+			printf("%s in line %d\n", clr_argument_error, line_number);
 					
-			error_in_source_code = true;
+			command_not_valid();
 			
 			return false;
 		}
 	}
 	
-	/* TODO */
+	else if (!strcmp(instruction, NOT))
+	{
+		printf("))))))))))))))))))))))))))))))))))))))))))\n");
 	
-	else if (!strcmp(instruction, NOT))  return true;
+		/* The command write like this: not r2. r2 is destination (operand2).
+		
+		   Because our definition of token assume destination after comma, we will refer to operand1 as a destination and
+		   
+		   operand2 not exist. 
+		*/
+		
+		if ((operand1 != NULL && !is_string_empty(operand1)) && (operand2 == NULL || is_string_empty(operand2)))
+		{
+			if (is_string_int_num(operand1) || strchr(operand1, ' ') != NULL)
+			{
+				printf("%s in line %d\n", not_dst_addressing_error, line_number);
+					
+				command_not_valid();
+			
+				return false;
+			}
+			
+			else
+			{
+				/* recognize addressing type */
+				
+				/* destination addressing: 1, 3 */
+				
+				if (does_direct_addressing(operand1))
+				{
+					*operand2_addressing_type = direct;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
+				
+				else if (does_direct_register_addressing(operand1))
+				{
+					*operand2_addressing_type = direct_register;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
+				
+				else
+				{
+					printf("%s in line %d\n", not_argument_error, line_number);
+					
+					command_not_valid();
+			
+					return false;
+				}	
+			}	
+		}
+		
+		else
+		{
+			printf("%s in line %d\n", not_argument_error, line_number);
+					
+			command_not_valid();
+			
+			return false;
+		}	
+	}
 	
-	else if (!strcmp(instruction, INC))  return true;
+	else if (!strcmp(instruction, INC))
+	{
+		printf("(((((((((((((((((((((((((((((((((((((((((((((((\n");
 	
-	else if (!strcmp(instruction, DEC))  return true;
+		/* The command write like this: inc r2. r2 is destination (operand2).
+		
+		   Because our definition of token assume destination after comma, we will refer to operand1 as a destination and
+		   
+		   operand2 not exist. 
+		*/
+		
+		if ((operand1 != NULL && !is_string_empty(operand1)) && (operand2 == NULL || is_string_empty(operand2)))
+		{
+			if (is_string_int_num(operand1) || strchr(operand1, ' ') != NULL)
+			{
+				printf("%s in line %d\n", inc_dst_addressing_error, line_number);
+					
+				command_not_valid();
+			
+				return false;
+			}
+			
+			else
+			{
+				/* recognize addressing type */
+				
+				/* destination addressing: 1, 3 */
+				
+				if (does_direct_addressing(operand1))
+				{
+					*operand2_addressing_type = direct;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
+				
+				else if (does_direct_register_addressing(operand1))
+				{
+					*operand2_addressing_type = direct_register;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
+				
+				else
+				{
+					printf("%s in line %d\n", inc_argument_error, line_number);
+					
+					command_not_valid();
+			
+					return false;
+				}	
+			}	
+		}
+		
+		else
+		{
+			printf("%s in line %d\n", inc_argument_error, line_number);
+					
+			command_not_valid();
+			
+			return false;
+		}
+	}
 	
-	else if (!strcmp(instruction, JMP))  return true;
+	else if (!strcmp(instruction, DEC))
+	{
+		printf("*************************************8\n");
 	
-	else if (!strcmp(instruction, BNE))  return true;
+		/* The command write like this: dec r4. r4 is destination (operand2).
+		
+		   Because our definition of token assume destination after comma, we will refer to operand1 as a destination and
+		   
+		   operand2 not exist. 
+		*/
+		
+		if ((operand1 != NULL && !is_string_empty(operand1)) && (operand2 == NULL || is_string_empty(operand2)))
+		{
+			if (is_string_int_num(operand1) || strchr(operand1, ' ') != NULL)
+			{
+				printf("%s in line %d\n", dec_dst_addressing_error, line_number);
+					
+				command_not_valid();
+			
+				return false;
+			}
+			
+			else
+			{
+				/* recognize addressing type */
+				
+				/* destination addressing: 1, 3 */
+				
+				if (does_direct_addressing(operand1))
+				{
+					*operand2_addressing_type = direct;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
+				
+				else if (does_direct_register_addressing(operand1))
+				{
+					*operand2_addressing_type = direct_register;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
+				
+				else
+				{
+					printf("%s in line %d\n", dec_argument_error, line_number);
+					
+					command_not_valid();
+			
+					return false;
+				}	
+			}	
+		}
+		
+		else
+		{
+			printf("%s in line %d\n", dec_argument_error, line_number);
+					
+			command_not_valid();
+			
+			return false;
+		}
+	}
 	
-	else if (!strcmp(instruction, JSR))  return true;
+	else if (!strcmp(instruction, JMP))
+	{
+		printf("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&7\n");
 	
-	else if (!strcmp(instruction, RED))  return true;
+		/* The command write like this: jmp &Line. &Line is destination (operand2).
+		
+		   Because our definition of token assume destination after comma, we will refer to operand1 as a destination and
+		   
+		   operand2 not exist. 
+		*/
+		
+		if ((operand1 != NULL && !is_string_empty(operand1)) && (operand2 == NULL || is_string_empty(operand2)))
+		{
+			if (is_string_int_num(operand1) || strchr(operand1, ' ') != NULL)
+			{
+				printf("%s in line %d\n", jmp_dst_addressing_error, line_number);
+					
+				command_not_valid();
+			
+				return false;
+			}
+			
+			else
+			{
+				/* recognize addressing type */
+				
+				/* destination addressing: 1, 3 */
+				
+				if (does_direct_addressing(operand1))
+				{
+					*operand2_addressing_type = direct;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
+				
+				else if (does_relative_addressing(operand1))
+				{
+					*operand2_addressing_type = relative;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
+				
+				else
+				{
+					printf("%s in line %d\n", jmp_argument_error, line_number);
+					
+					command_not_valid();
+			
+					return false;
+				}	
+			}	
+		}
+		
+		else
+		{
+			printf("%s in line %d\n", jmp_argument_error, line_number);
+					
+			command_not_valid();
+			
+			return false;
+		}
+	}
 	
-	else if (!strcmp(instruction, PRN))  return true;
+	else if (!strcmp(instruction, BNE))
+	{
+		printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^6\n");
+		
+		/* The command write like this: bne Line. Line is destination (operand2).
+		
+		   Because our definition of token assume destination after comma, we will refer to operand1 as a destination and
+		   
+		   operand2 not exist. 
+		*/
+		
+		if ((operand1 != NULL && !is_string_empty(operand1)) && (operand2 == NULL || is_string_empty(operand2)))
+		{
+			if (is_string_int_num(operand1) || strchr(operand1, ' ') != NULL)
+			{
+				printf("%s in line %d\n", bne_dst_addressing_error, line_number);
+					
+				command_not_valid();
+			
+				return false;
+			}
+			
+			else
+			{
+				/* recognize addressing type */
+				
+				/* destination addressing: 1, 3 */
+				
+				if (does_direct_addressing(operand1))
+				{
+					*operand2_addressing_type = direct;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
+				
+				else if (does_relative_addressing(operand1))
+				{
+					*operand2_addressing_type = relative;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
+				
+				else
+				{
+					printf("%s in line %d\n", bne_argument_error, line_number);
+					
+					command_not_valid();
+			
+					return false;
+				}	
+			}	
+		}
+		
+		else
+		{
+			printf("%s in line %d\n", bne_argument_error, line_number);
+					
+			command_not_valid();
+			
+			return false;
+		}
+	}
 	
-	else if (!strcmp(instruction, RTS))  return true;
+	else if (!strcmp(instruction, JSR))
+	{
+		printf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55\n");
 	
-	else if (!strcmp(instruction, STOP)) return true;
+		/* The command write like this: jst SUBR. SUBR is destination (operand2).
+		
+		   Because our definition of token assume destination after comma, we will refer to operand1 as a destination and
+		   
+		   operand2 not exist. 
+		*/
+		
+		if ((operand1 != NULL && !is_string_empty(operand1)) && (operand2 == NULL || is_string_empty(operand2)))
+		{
+			if (is_string_int_num(operand1) || strchr(operand1, ' ') != NULL)
+			{
+				printf("%s in line %d\n", jsr_dst_addressing_error, line_number);
+					
+				command_not_valid();
+			
+				return false;
+			}
+			
+			else
+			{
+				/* recognize addressing type */
+				
+				/* destination addressing: 1, 3 */
+				
+				if (does_direct_addressing(operand1))
+				{
+					*operand2_addressing_type = direct;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
+				
+				else if (does_relative_addressing(operand1))
+				{
+					*operand2_addressing_type = relative;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
+				
+				else
+				{
+					printf("%s in line %d\n", jsr_argument_error, line_number);
+					
+					command_not_valid();
+			
+					return false;
+				}	
+			}	
+		}
+		
+		else
+		{
+			printf("%s in line %d\n", jsr_argument_error, line_number);
+					
+			command_not_valid();
+			
+			return false;
+		}
+	}
 	
-	else                                 return false;
+	else if (!strcmp(instruction, RED))
+	{
+		printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$44\n");
+	
+		/* The command write like this: red r1. r1 is destination (operand2).
+		
+		   Because our definition of token assume destination after comma, we will refer to operand1 as a destination and
+		   
+		   operand2 not exist. 
+		*/
+		
+		if ((operand1 != NULL && !is_string_empty(operand1)) && (operand2 == NULL || is_string_empty(operand2)))
+		{
+			if (is_string_int_num(operand1) || strchr(operand1, ' ') != NULL)
+			{
+				printf("%s in line %d\n", red_dst_addressing_error, line_number);
+					
+				command_not_valid();
+			
+				return false;
+			}
+			
+			else
+			{
+				/* recognize addressing type */
+				
+				/* destination addressing: 1, 3 */
+				
+				if (does_direct_addressing(operand1))
+				{
+					*operand2_addressing_type = direct;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
+				
+				else if (does_direct_register_addressing(operand1))
+				{
+					*operand2_addressing_type = direct_register;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
+				
+				else
+				{
+					printf("%s in line %d\n", red_argument_error, line_number);
+					
+					command_not_valid();
+			
+					return false;
+				}	
+			}	
+		}
+		
+		else
+		{
+			printf("%s in line %d\n", red_argument_error, line_number);
+					
+			command_not_valid();
+			
+			return false;
+		}
+	}
+	
+	else if (!strcmp(instruction, PRN))
+	{
+		/* The command write like this: prn r1. r1 is destination (operand2).
+		
+		   Because our definition of token assume destination after comma, we will refer to operand1 as a destination and
+		   
+		   operand2 not exist. 
+		*/
+		
+		if ((operand1 != NULL && !is_string_empty(operand1)) && (operand2 == NULL || is_string_empty(operand2)))
+		{
+			if (is_string_int_num(operand1) || strchr(operand1, ' ') != NULL)
+			{
+				printf("%s in line %d\n", prn_dst_addressing_error, line_number);
+					
+				command_not_valid();
+			
+				return false;
+			}
+			
+			else
+			{
+				/* recognize addressing type */
+				
+				/* destination addressing: 0, 1, 3 */
+					
+				if (does_immediate_addressing(operand1))
+				{
+					*operand2_addressing_type = immediate;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
+				
+				else if (does_direct_addressing(operand1))
+				{
+					*operand2_addressing_type = direct;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
+				
+				else if (does_relative_addressing(operand1))
+				{
+					*operand2_addressing_type = relative;
+					
+					error_in_source_code = false;
+					
+					return true;
+				}
+				
+				else
+				{
+					printf("%s in line %d\n", prn_argument_error, line_number);
+					
+					command_not_valid();
+			
+					return false;
+				}	
+			}	
+		}
+		
+		else
+		{
+			printf("%s in line %d\n", prn_argument_error, line_number);
+					
+			command_not_valid();
+			
+			return false;
+		}
+	}
+	
+	else if (!strcmp(instruction, RTS))
+	{
+		printf("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@2\n");
+	
+		/* completely without operands */
+		
+		if (operand1 != NULL || !is_string_empty(operand1) || operand2 != NULL || !is_string_empty(operand2))
+		{
+			printf("%s in line %d\n", rts_argument_error, line_number);
+					
+			command_not_valid();
+			
+			return false;
+		}
+		else
+		{
+			error_in_source_code = false;
+					
+			return true;
+		} 
+	}
+	
+	else if (!strcmp(instruction, STOP))
+	{
+		/* completely without operands */
+		
+		if ((operand1 == NULL || is_string_empty(operand1)) && (operand2 == NULL || is_string_empty(operand2)))
+		{
+			error_in_source_code = false;
+					
+			return true;
+		}
+		else
+		{
+			printf("%s in line %d\n", stop_argument_error, line_number);
+					
+			command_not_valid();
+			
+			return false;
+		} 
+	}
+	
+	else 
+	{
+		printf("%s in line %d\n", no_legal_command, line_number);
+					
+		command_not_valid();
+			
+		return false;
+	}
 }
 
 bool is_operand_register(const char* operand)
@@ -480,14 +1229,14 @@ bool does_immediate_addressing(const char* operand)
 	if (first_char == immediate_addressing) /* does immediate addressing (0)? */
 	{
 		/* check if appear int num after # */
-					
+				
 		char* sub_operand = get_substring_after_first_char(operand);
-					
+								
 		bool is_digit = is_string_int_num(sub_operand);
 					
 		if (!is_digit)
 		{
-			printf("%s in line %d\n", mov_immediate_error, line_number);
+			printf("%s in line %d\n", immediate_addressing_error, line_number);
 						
 			error_in_source_code = true;
 			
@@ -555,5 +1304,12 @@ bool does_relative_addressing(const char* operand)
 bool does_direct_register_addressing(const char* operand)
 {
 	return is_operand_register(operand);
+}
+
+void command_not_valid()
+{
+	*operand1_addressing_type = *operand2_addressing_type = illegal;
+					
+	error_in_source_code = true;
 }
 

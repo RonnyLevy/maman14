@@ -44,4 +44,6 @@ void line_analysis(const char* line);
 
 bool tokens_processing(const char* token[]);
 
+void clear_current_data_for_next_line();
+
 #endif

@@ -30,17 +30,21 @@ static const char extern_guidance[] = ".extern";
 
 static int line_number = 1; /* count the lines to report an error in a particular line */
 
-static bool error_in_source_code = false; /* this flag will be set if and only if found some error in source code */
+typedef enum {immediate, direct, relative, direct_register, illegal} addressing_type; /* 0, 1, 2, 3 , 4 */
+
+static addressing_type operand1_addressing = illegal; /* defautl value, until the test will yield a different value */
+	
+static addressing_type* operand1_addressing_type = &operand1_addressing; 
+	 
+static addressing_type operand2_addressing = illegal; /* defautl value, until the test will yield a different value */
+	 
+static addressing_type* operand2_addressing_type = &operand2_addressing;
+
+static bool error_in_source_code = false; /* in order to know no to create obj file */
 
 static int* pc; /* program counter to next instruction. all addresses are 32 bit (assume 4 bytes for int) */
 
 typedef enum { r0, r1, r2, r3, r4, r5, r6, r7 } _register;
-
-typedef enum {immediate, direct, relative, direct_register} addressing_type; /* 0, 1, 2, 3 */
-
-static addressing_type operand1_addressing_type;
-
-static addressing_type operand2_addressing_type;
 
 /* program status word */
 
@@ -114,7 +118,7 @@ static int symbol_table_idx = 0;
 
 bool is_label_exist_in_symbol_table(const char* label_name);
 
-bool is_instruction_valid(const char* instruction, const char* operand1, const char* operand2, int operand1_addressing, int operand2_addressing, const int line_number); /* operand1/2_addressing equal to 0, 1, 2 or 3*/
+bool is_instruction_valid(const char* instruction, const char* operand1, const char* operand2, addressing_type* operand1_addressing_type, addressing_type* operand2_addressing_type, const int line_number); /* operand1/2_addressing equal to 0, 1, 2 or 3*/
 
 void parse_data_guidance_operands(const char* operand1, const char* operand2, const int line_number);
 
@@ -129,6 +133,8 @@ bool does_direct_addressing(const char* operand);
 bool does_relative_addressing(const char* operand);
 
 bool does_direct_register_addressing(const char* operand);
+
+void command_not_valid();
 
 void build_word_machine_code(); /* |op-code||source addressing||source register|||destination addressing||destination register||fucnt||A||R||E|
 

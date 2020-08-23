@@ -18,7 +18,7 @@ static const char data_guidance_invalid_number[] = "ERROR:: data guidance must c
 
 static const char string_guidance_operand[] = "ERROR:: must be exactly one argument for string guidance in first operand";
 
-static const char immediate_addressing_error[] = "ERROR:: immediate addressing contain illegal label"; 
+static const char immediate_addressing_error[] = "ERROR:: immediate addressing must contain integar number after #"; 
 
 static const char mov_arguments_error[] = "ERROR:: mov command requires two arguments";
 
@@ -50,49 +50,55 @@ static const char lea_src_addressing_error[] = "ERROR:: lea command requires onl
 
 static const char lea_dst_addressing_error[] = "ERROR:: lea command requires only direct and register direct for destination addressing";
 
-static const char clr_src_addressing_error[] = "ERROR:: clr command not requires source operand";
+static const char lea_arguments_error[] = "ERROR:: lea arguments not valid";
 
 static const char clr_dst_addressing_error[] = "ERROR:: clr command requires only direct and register direct for destination addressing";
 
-static const char not_src_addressing_error[] = "ERROR:: not command not requires source operand";
+static const char clr_argument_error[] = "ERROR:: clr arguments not valid";
 
 static const char not_dst_addressing_error[] = "ERROR:: not command requires only direct and register direct for destination addressing";
 
-static const char inc_src_addressing_error[] = "ERROR:: inc command not requires source operand";
+static const char not_argument_error[] = "ERROR:: not arguments not valid";
 
 static const char inc_dst_addressing_error[] = "ERROR:: inc command requires only direct and register direct for destination addressing";
 
-static const char dec_src_addressing_error[] = "ERROR:: dec command not requires source operand";
+static const char inc_argument_error[] = "ERROR:: in arguments not valid";
 
 static const char dec_dst_addressing_error[] = "ERROR:: dec command requires only direct and register direct for destination addressing";
 
-static const char jmp_src_addressing_error[] = "ERROR:: jmp command not requires source operand";
+static const char dec_argument_error[] = "ERROR:: dec arguments not valid";
 
 static const char jmp_dst_addressing_error[] = "ERROR:: jmp command requires only direct and relative for destination addressing";
 
-static const char bne_src_addressing_error[] = "ERROR:: bne command not requires source operand";
+static const char jmp_argument_error[] = "ERROR:: jmp arguments not valid";
 
 static const char bne_dst_addressing_error[] = "ERROR:: bne command requires only direct and relative for destination addressing";
 
-static const char jsr_src_addressing_error[] = "ERROR:: jsr command not requires source operand";
+static const char bne_argument_error[] = "ERROR:: bne arguments not valid";
 
 static const char jsr_dst_addressing_error[] = "ERROR:: jsr command requires only direct and relative for destination addressing";
 
-static const char red_src_addressing_error[] = "ERROR:: red command not requires source operand";
+static const char jsr_argument_error[] = "ERROR:: jsr arguments not valid";
 
 static const char red_dst_addressing_error[] = "ERROR:: red command requires only direct and register direct for destination addressing";
 
-static const char prn_src_addressing_error[] = "ERROR:: prn command not requires addressing for source";
+static const char red_argument_error[] = "ERROR:: red arguments not valid";
 
 static const char prn_dst_addressing_error[] = "ERROR:: prn command requires only immediate, direct and register direct for destination addressing";
+
+static const char prn_argument_error[] = "ERROR:: prn arguments not valid";
 
 static const char rts_src_addressing_error[] = "ERROR:: rts command not requires source operand";
 
 static const char rts_dst_addressing_error[] = "ERROR:: rts command not requires destination operand";
 
+static const char rts_argument_error[] = "ERROR:: rts arguments not valid";
+
 static const char stop_src_addressing_error[] = "ERROR:: stop command not requires source operand";
 
 static const char stop_dst_addressing_error[] = "ERROR:: stop command not requires destination operand";
+
+static const char stop_argument_error[] = "ERROR:: rts arguments not valid";
 
 static const char no_legal_command[] = "ERROR:: illegal command";
 

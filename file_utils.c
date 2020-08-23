@@ -151,7 +151,10 @@ void line_analysis(const char* line)
    	}
    	else
    	{
-   		tokens[tokens_arr_index] = NULL; /* remember the structure: tokens[0] - label, tokens[1] - instruction, tokens[2] - 										operand1 , tokens[3] - operand2. if not exist - NULL */
+   		tokens[tokens_arr_index] = NULL; /* remember the structure: tokens[0] - label, tokens[1] - instruction, tokens[2] - 										
+   											operand1 , tokens[3] - operand2. if not exist - NULL 
+   											
+   										 */
    	}  	
    	
    	tokens_arr_index++;
@@ -190,13 +193,7 @@ void line_analysis(const char* line)
 	
 	/* in the end, clear all for next line */
 	
-	int clr_index = 0;
-	
-	for ( ; clr_index < tokens_arr_index ; clr_index++)	tokens[clr_index] = NULL;
-	
-	has_symbol = false;  
-	
-	tokens_arr_index = 0;
+	clear_current_data_for_next_line();
 }
  
 bool tokens_processing(const char* tokens[])
@@ -212,10 +209,6 @@ bool tokens_processing(const char* tokens[])
 	label new_label;
 	
 	label* new_label_ptr = &new_label; /* for filling label (if exist) */
-	
-	int operand1_addressing = -1; /* defautl value, until the test will yield a different value */
-	 
-	int operand2_addressing = -1; /* defautl value, until the test will yield a different value */
 	
 	/* The most important token now is token[1]. try to identify which kind of type instruction is.
 	
@@ -277,7 +270,7 @@ bool tokens_processing(const char* tokens[])
 	{
 	  	/* TODO */	
 	}
-	else if (is_instruction_valid(command, operand1, operand2, operand1_addressing, operand2_addressing, line_number))
+	else if (is_instruction_valid(command, operand1, operand2, operand1_addressing_type, operand2_addressing_type, line_number))
 	{
 		int i = 0;
 		
@@ -293,5 +286,22 @@ bool tokens_processing(const char* tokens[])
 			
 		return false;		
 	}	
+}
+
+void clear_current_data_for_next_line()
+{
+	int clr_index = 0;
+	
+	for ( ; clr_index < tokens_arr_index ; clr_index++)	tokens[clr_index] = NULL;
+	
+	has_symbol = false;  
+	
+	tokens_arr_index = 0;
+	
+	error_in_source_code = false;
+	
+	*operand1_addressing_type = illegal;
+	
+	*operand2_addressing_type = illegal;
 }
 
